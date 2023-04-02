@@ -3377,7 +3377,7 @@ static enum drm_mode_status mtk_dp_conn_mode_valid(struct drm_connector *conn,
 
 	if (mode->hdisplay == 3840 && mode->vdisplay == 2160 &&
 		mode->vrefresh == 60 && mtk_dp->has_dsc)
-		bandwidth = bandwidth * 594 / 202.5;
+		bandwidth = bandwidth * 594 * 2 / 405; //doubled before and after divide to avoid floating point calculation
 
 	if (fakecablein == true)
 		bandwidth = dp_plat_limit[0].clock;
