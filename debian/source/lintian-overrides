@@ -1,0 +1,3 @@
+astro-linux-kernel source: source-is-missing scripts/mkimage
+astro-linux-kernel source: source-is-missing scripts/dtc/dtc_overlay
+astro-linux-kernel source: source-is-missing scripts/dtc/ufdt_apply_overlay

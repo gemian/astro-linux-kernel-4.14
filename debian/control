@@ -1,0 +1,36 @@
+Source: astro-linux-kernel
+Section: kernel
+Priority: optional
+Maintainer: Adam Boardman <adamboardman@gmail.com>
+Build-Depends:
+ python,
+ git,
+ ca-certificates,
+ bc,
+ curl,
+ libssl-dev,
+ gcc-aarch64-linux-gnu,
+Standards-Version: 3.9.8
+Vcs-Git: https://github.com/gemian/astro-linux-kernel-4.14.git
+Homepage: https://www.kernel.org/
+
+Package: astro-linux-kernel
+Architecture: any
+Multi-Arch: same
+Depends:
+ mkbootimg,
+ initramfs-tools-halium,
+Recommends:
+Description: Gemian Kernel with Modules for Astro Slide
+ .
+
+Package: astro-linux-kernel-headers
+Architecture: all
+Multi-Arch: foreign
+Depends:
+ astro-linux-kernel,
+Conflicts:
+Replaces:
+Recommends:
+Description: Headers for Gemian Kernel with Modules for Astro Slide
+ .
