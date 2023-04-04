@@ -16,6 +16,7 @@ Homepage: https://www.kernel.org/
 
 Package: astro-linux-kernel
 Architecture: any
+Provides: planet-linux-kernel
 Multi-Arch: same
 Depends:
  mkbootimg,
