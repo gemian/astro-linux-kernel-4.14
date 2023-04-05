@@ -3,7 +3,7 @@ Section: kernel
 Priority: optional
 Maintainer: Adam Boardman <adamboardman@gmail.com>
 Build-Depends:
- python,
+ python3,
  git,
  ca-certificates,
  bc,
