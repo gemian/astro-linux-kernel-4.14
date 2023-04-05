@@ -5,3 +5,9 @@ config MTK_AW9523
 	  Say Y here if you have AW9523 Key device.
 
 	  If unsure, say Y.
+
+config MTK_AW9524_UNDER_AW9523_LED
+	tristate "MTK AW9524 under AW9523 LED Support"
+	default n
+	help
+	  Say Y here if building for Astro Slide.
