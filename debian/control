@@ -10,6 +10,7 @@ Build-Depends:
  curl,
  libssl-dev,
  gcc-aarch64-linux-gnu,
+ xz-utils
 Standards-Version: 3.9.8
 Vcs-Git: https://github.com/gemian/astro-linux-kernel-4.14.git
 Homepage: https://www.kernel.org/
