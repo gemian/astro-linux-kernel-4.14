@@ -103,15 +103,23 @@ static void hall_work_handler(struct work_struct *work)
 		hall_notifier_call_chain(fcover_close_flag, NULL);
 
 		input_report_switch(accdet_input_dev, SW_LID, (fcover_close_flag == HALL_FCOVER_CLOSE));
-		input_sync(accdet_input_dev);
 		if (fcover_close_flag == HALL_FCOVER_CLOSE)
 		{
+			input_report_key(accdet_input_dev, KEY_F12, 1);
+			input_sync(accdet_input_dev);
+			mdelay(10);
+			input_report_key(accdet_input_dev, KEY_F12, 0);
 			HALL_LOG("=======HALL_FCOVER_CLOSE==== %d\n", (int)accdet_input_dev->swbit[SW_LID]);
 		}
 		else
 		{
+			input_report_key(accdet_input_dev, KEY_F11, 1);
+			input_sync(accdet_input_dev);
+			mdelay(10);
+			input_report_key(accdet_input_dev, KEY_F11, 0);
 			HALL_LOG("=======HALL_FCOVER_OPEN==== %d\n", (int)accdet_input_dev->swbit[SW_LID]);
 		}
+		input_sync(accdet_input_dev);
 		extcon_set_state_sync(fcover_data, EXTCON_MECHANICAL, fcover_close_flag);
 	}
 	if(new_fcover)
