@@ -1,3 +1,1 @@
-astro-linux-kernel source: source-is-missing scripts/dtc/dtc_overlay
-astro-linux-kernel source: source-is-missing scripts/dtc/ufdt_apply_overlay
-astro-linux-kernel source: license-problem-gfdl-invariants Documentation/media/uapi/fdl-appendix.rst
+astro-linux-kernel source: license-problem-gfdl-invariants invariant part is: with the :ref:`invariant sections <fdl-invariant>` being list their titles, with the :ref:`front-cover texts <fdl-cover-texts>` being list, and with the :ref:`back-cover texts <fdl-cover-texts>` being list [Documentation/media/uapi/fdl-appendix.rst

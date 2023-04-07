@@ -1366,6 +1366,10 @@ headers_check: headers_install
 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include HDRCHECK=1
 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst) HDRCHECK=1
 
+PHONY += modules_headers_install
+modules_headers_install:
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules_headers_install.sh
+
 # ---------------------------------------------------------------------------
 # Kernel selftest
 
