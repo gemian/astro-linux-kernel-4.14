@@ -1865,7 +1865,7 @@ static int __init scp_init(void)
 	scp_ready_timer[SCP_A_ID].data = (unsigned long) SCP_A_TIMER;
 #endif
     /* scp platform initialise */
-	pr_debug("[SCP2] %s begins\n", __func__);
+	pr_debug("[v02][SCP2] %s begins\n", __func__);
 
 	/* scp ready static flag initialise */
 	for (i = 0; i < SCP_CORE_TOTAL ; i++) {
@@ -1890,30 +1890,30 @@ static int __init scp_init(void)
 #if SCP_RESERVED_MEM && defined(CONFIG_OF_RESERVED_MEM)
 	/* make sure the reserved memory for scp is ready */
 	if (scp_mem_size == 0) {
-		pr_err("[SCP]Reserving memory by of_device for SCP failed.\n");
+		pr_err("[v02][SCP]Reserving memory by of_device for SCP failed.\n");
 		return -1;
 	}
 #endif  // SCP_RESERVED_MEM && defined(CONFIG_OF_RESERVED_MEM)
 
 	if (platform_driver_register(&mtk_scp_device))
-		pr_err("[SCP] scp probe fail\n");
+		pr_err("[v02][SCP] scp probe fail\n");
 
 	if (platform_driver_register(&mtk_scpsys_device))
-		pr_err("[SCP] scpsys probe fail\n");
+		pr_err("[v02][SCP] scpsys probe fail\n");
 
 	/* skip initial if dts status = "disable" */
 	if (!scp_enable[SCP_A_ID]) {
-		pr_err("[SCP] scp disabled!!\n");
+		pr_err("[v02][SCP] scp disabled!!\n");
 		goto err;
 	}
 	/* scp platform initialise */
 	scp_region_info_init();
-	pr_debug("[SCP] platform init\n");
+	pr_debug("[v02][SCP] platform init\n");
 	scp_awake_init();
 	scp_workqueue = create_singlethread_workqueue("SCP_WQ");
 	ret = scp_excep_init();
 	if (ret) {
-		pr_err("[SCP]Excep Init Fail\n");
+		pr_err("[v02][SCP]Excep Init Fail\n");
 		goto err;
 	}
 
