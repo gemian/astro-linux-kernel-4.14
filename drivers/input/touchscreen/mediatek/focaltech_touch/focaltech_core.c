@@ -1494,7 +1494,7 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
         return ret;
     }
 
-    FTS_INFO("Touch Screen(I2C BUS) driver prboe successfully");
+    FTS_INFO("Touch Screen(I2C BUS) driver probe successfully - focaltech_touch");
     return 0;
 }
 

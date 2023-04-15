@@ -1269,7 +1269,7 @@ static int fts_ts_probe(struct i2c_client *client,
 		return ret;
 	}
 
-	FTS_INFO("Touch Screen(I2C BUS) driver prboe successfully");
+	FTS_INFO("Touch Screen(I2C BUS) driver probe successfully - FT3518");
 	return 0;
 }
 
