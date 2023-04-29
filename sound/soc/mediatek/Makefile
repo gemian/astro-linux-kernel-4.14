@@ -44,7 +44,7 @@ MTK_CODEC := $(subst ",,$(CONFIG_MTK_SND_SOC_CODEC))
 
 # PMIC include path
 ifneq  ($(MTK_CODEC),)
-subdir-ccflags-y += -Werror -Werror -Icodec/$(MTK_CODEC)/
+subdir-ccflags-y += -Werror -Icodec/$(MTK_CODEC)/
 subdir-ccflags-y += -Werror -I$(src)/common_int
 
 # Update pmic built flow to avoid codec init later than codec probe
