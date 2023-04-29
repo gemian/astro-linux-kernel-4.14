@@ -40,6 +40,7 @@
 #include <linux/of_irq.h>
 #include <linux/miscdevice.h>
 #include <linux/workqueue.h>
+#include <linux/extcon.h>
 #ifdef CONFIG_MTK_AW9524_UNDER_AW9523_LED
 #include <mt-plat/mtk_pwm.h>
 #endif
@@ -257,6 +258,7 @@ static void aw9523_i2c_early_resume(struct i2c_client *client);
 
 bool aw9523MetaKeyPressed = false;
 struct input_dev *aw9523_kpd_input_dev;
+extern struct extcon_dev *fcover_data;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GPIO Control
@@ -919,6 +921,9 @@ static int aw9523_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 
 #ifdef CONFIG_AW9523_HALL
     aw9523_key->is_device_closed = true;
+    if (fcover_data) {
+        aw9523_key->is_device_closed = (extcon_get_state(fcover_data, EXTCON_MECHANICAL) == HALL_FCOVER_CLOSE);
+    }
     aw9523_key->hall_notif.notifier_call = aw9523_hall_notifier_callback;
     err = hall_register_client(&aw9523_key->hall_notif);
     if (err) {

@@ -41,7 +41,7 @@ static int hall_pdrv_resume(struct platform_device *pdev);
 extern void mt_irq_set_polarity(unsigned int irq, unsigned int polarity);
 
 
-static struct extcon_dev *fcover_data;
+struct extcon_dev *fcover_data = NULL;
 static struct work_struct fcover_work;
 static struct delayed_work fcover_delayed_work;
 static struct workqueue_struct *fcover_workqueue = NULL;
