@@ -34,6 +34,9 @@ static int kpd_enable_lprst = 1;
 static u16 kpd_keymap_state[KPD_NUM_MEMS] = {
 	0xffff, 0xffff, 0xffff, 0xffff, 0x00ff
 };
+extern struct input_dev *aw9523_kpd_input_dev;
+extern bool aw9523MetaKeyPressed;
+bool powerKeyWasPressed = false;
 
 static void enable_kpd(int enable)
 {
@@ -237,10 +240,17 @@ void kpd_pmic_pwrkey_hal(unsigned long pressed)
 	struct task_struct *hd_thread;
 #endif
 
-	input_report_key(kpd_input_dev, kpd_dts_data.kpd_sw_pwrkey, pressed);
-	input_sync(kpd_input_dev);
-	kpd_print(KPD_SAY "(%s) HW keycode =%d using PMIC\n",
-	       pressed ? "pressed" : "released", kpd_dts_data.kpd_sw_pwrkey);
+	kpd_print("pwrkey_hal pressed:%d, meta:%d, was:%d \n",(int)pressed,aw9523MetaKeyPressed,powerKeyWasPressed);
+	if (aw9523MetaKeyPressed || powerKeyWasPressed) {
+		kpd_print("KEY_POWER");
+		input_report_key(aw9523_kpd_input_dev, KEY_POWER, pressed);
+		powerKeyWasPressed = !!pressed;
+	} else {
+		kpd_print("KEY_ESC");
+		input_report_key(aw9523_kpd_input_dev, KEY_ESC, pressed);
+	}
+	input_sync(aw9523_kpd_input_dev);
+
 #ifdef CONFIG_LONG_POWERKEY_LOG_STORE
 	if (pressed) {
 		long_press_dump_timer.expires = jiffies + 6*HZ;
