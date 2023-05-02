@@ -545,7 +545,7 @@ static ssize_t goodix_ts_send_cfg_store(struct device *dev,
 		if (ret < 0)
 			ts_err("send config failed");
 	}
-		
+
 exit:
 	hw_ops->irq_enable(core_data, true);
 	kfree(config);
@@ -761,7 +761,7 @@ static ssize_t goodix_ts_esd_info_show(struct device *dev,
 		     "enabled" : "disabled");
 
 	return r;
-}					   
+}
 
 /* enable/disable esd */
 static ssize_t goodix_ts_esd_info_store(struct device *dev,
@@ -775,7 +775,7 @@ static ssize_t goodix_ts_esd_info_store(struct device *dev,
 		goodix_ts_blocking_notify(NOTIFY_ESD_ON, NULL);
 	else
 		goodix_ts_blocking_notify(NOTIFY_ESD_OFF, NULL);
-	return count;		
+	return count;
 }
 
 static DEVICE_ATTR(driver_info, S_IRUGO, goodix_ts_driver_info_show, NULL);
@@ -1081,6 +1081,69 @@ static int goodix_parse_dt(struct device_node *node,
 }
 #endif
 
+enum {
+	RR_Rotate_0=1,
+	RR_Rotate_90=2,
+	RR_Rotate_180=4,
+	RR_Rotate_270=8
+};
+
+static void goodix_ts_set_screen_rotation(struct input_dev *input_dev, int val) {
+	struct goodix_ts_core *ts = goodix_modules.core_data;
+	struct goodix_ts_board_data *ts_bdata = board_data(ts);
+	if (ts->screen_rotation != val) {
+		int x_max = ts_bdata->panel_max_x;
+		int y_max = ts_bdata->panel_max_y;
+		switch (val) {
+			case RR_Rotate_0:
+			case RR_Rotate_180:
+				x_max = ts_bdata->panel_max_x;
+				y_max = ts_bdata->panel_max_y;
+				break;
+			case RR_Rotate_90:
+			case RR_Rotate_270:
+				x_max = ts_bdata->panel_max_y;
+				y_max = ts_bdata->panel_max_x;
+				break;
+			default:
+				val = RR_Rotate_0;
+				break;
+		}
+		ts_debug("goodix rotation:%d, x_max: %d, y_max: %d", val, x_max, y_max);
+		ts->screen_rotation = val;
+		input_set_abs_params(input_dev, ABS_MT_POSITION_X, 0, x_max, 0, 0);
+		input_set_abs_params(input_dev, ABS_MT_POSITION_Y, 0, y_max, 0, 0);
+	}
+}
+
+static void goodix_ts_report_rotated(struct input_dev *dev, int rotation, int xpos, int ypos) {
+	struct goodix_ts_core *ts = goodix_modules.core_data;
+	struct goodix_ts_board_data *ts_bdata = board_data(ts);
+	int x = ts_bdata->panel_max_x - xpos;
+	int y = ypos;
+	switch (rotation) {
+		case RR_Rotate_0: // 1
+			x = ts_bdata->panel_max_x - xpos;
+			y = ypos;
+			break;
+		case RR_Rotate_90: // 2
+			x = ypos;
+			y = xpos;
+			break;
+		case RR_Rotate_180: // 4
+			x = xpos;
+			y = ts_bdata->panel_max_y - ypos;
+			break;
+		case RR_Rotate_270: // 8
+			x = ts_bdata->panel_max_y - ypos;
+			y = ts_bdata->panel_max_x - xpos;
+			break;
+	}
+	ts_debug("goodix report:%d, x: %d, y: %d", rotation, x, y);
+	input_report_abs(dev, ABS_MT_POSITION_X, x);
+	input_report_abs(dev, ABS_MT_POSITION_Y, y);
+}
+
 static void goodix_ts_report_pen(struct input_dev *dev,
 		struct goodix_pen_data *pen_data)
 {
@@ -1128,15 +1191,15 @@ static void goodix_ts_report_finger(struct input_dev *dev,
 				touch_data->coords[i].p);
 			input_mt_slot(dev, i);
 			input_mt_report_slot_state(dev, MT_TOOL_FINGER, true);
-			input_report_abs(dev, ABS_MT_POSITION_X,
-					1080 - touch_data->coords[i].x);
-			input_report_abs(dev, ABS_MT_POSITION_Y,
+			goodix_ts_report_rotated(dev,
+					goodix_modules.core_data->screen_rotation,
+					touch_data->coords[i].x,
 					touch_data->coords[i].y);
 			input_report_abs(dev, ABS_MT_TOUCH_MAJOR,
-					touch_data->coords[i].w);			
+					touch_data->coords[i].w);
 		} else {
 			input_mt_slot(dev, i);
-			input_mt_report_slot_state(dev, MT_TOOL_FINGER, false);			
+			input_mt_report_slot_state(dev, MT_TOOL_FINGER, false);
 		}
 	}
 
@@ -1396,7 +1459,7 @@ static int goodix_ts_gpio_setup(struct goodix_ts_core *core_data)
 			return r;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -1438,10 +1501,7 @@ static int goodix_ts_input_dev_config(struct goodix_ts_core *core_data)
 #endif
 
 	/* set input parameters */
-	input_set_abs_params(input_dev, ABS_MT_POSITION_X,
-			     0, ts_bdata->panel_max_x, 0, 0);
-	input_set_abs_params(input_dev, ABS_MT_POSITION_Y,
-			     0, ts_bdata->panel_max_y, 0, 0);
+	goodix_ts_set_screen_rotation(input_dev, RR_Rotate_90); //Gemian - Astro default orientation
 	input_set_abs_params(input_dev, ABS_MT_TOUCH_MAJOR,
 			     0, ts_bdata->panel_max_w, 0, 0);
 #ifdef INPUT_TYPE_B_PROTOCOL
@@ -2018,7 +2078,7 @@ static int goodix_later_init_thread(void *data)
 	/* setp3: get fw version and ic_info
 	 * at this step we believe that the ic is in normal mode,
 	 * if the version info is invalid there must have some
-	 * problem we cann't cover so exit init directly.
+	 * problem we can't cover so exit init directly.
 	 */
 	ret = hw_ops->read_version(cd, &cd->fw_version);
 	if (ret) {
@@ -2031,7 +2091,7 @@ static int goodix_later_init_thread(void *data)
 		goto uninit_fw;
 	}
 
-	/* the recomend way to update ic config is throuth ISP,
+	/* the recommend way to update ic config is through ISP,
 	 * if not we will send config with interactive mode
 	 */
 	goodix_send_ic_config(cd, CONFIG_TYPE_NORMAL);
@@ -2083,17 +2143,17 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	int ret;
 
 	ts_info("goodix_ts_probe IN");
-	
+
 	if (IsAeonHdmi == 1) {
 		printk("Display device is hdmi, disable touchscreen!\n");
 		return -ENODEV;
 	}
-	
+
 	if (tpd_load_status == 1) { //aeon add
 		ts_err("Another touch panel has already working");
 		return -ENODEV;
 	}
-	
+
 	bus_interface = pdev->dev.platform_data;
 	if (!bus_interface) {
 		ts_err("Invalid touch device");
@@ -2176,9 +2236,9 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	core_module_prob_sate = CORE_MODULE_PROB_SUCCESS;
 
 	complete_all(&goodix_modules.core_comp);
-	
+
 	tpd_load_status = 1; //aeon add
-	
+
 	ts_info("goodix_ts_core probe success");
 	return 0;
 
@@ -2222,6 +2282,26 @@ static int goodix_ts_remove(struct platform_device *pdev)
 	return 0;
 }
 
+static ssize_t goodix_ts_show_screen_rotation(struct device_driver *driver, char *buf)
+{
+	struct goodix_ts_core *ts = goodix_modules.core_data;
+	if (ts) {
+		return scnprintf(buf, PAGE_SIZE, "%d\n", ts->screen_rotation);
+	} else {
+		return scnprintf(buf, PAGE_SIZE, "No Core Data\n");
+	}
+}
+
+static ssize_t goodix_ts_store_screen_rotation(struct device_driver *driver, const char *buf, size_t count)
+{
+	struct goodix_ts_core *ts = goodix_modules.core_data;
+	int val;
+	if (!kstrtoint(buf, 0, &val)) {
+		goodix_ts_set_screen_rotation(ts->input_dev, val);
+	}
+	return count;
+}
+
 #ifdef CONFIG_PM
 static const struct dev_pm_ops dev_pm_ops = {
 #if !defined(CONFIG_FB) && !defined(CONFIG_HAS_EARLYSUSPEND)
@@ -2236,6 +2316,8 @@ static const struct platform_device_id ts_core_ids[] = {
 	{}
 };
 MODULE_DEVICE_TABLE(platform, ts_core_ids);
+
+static DRIVER_ATTR(screen_rotation, 0644, goodix_ts_show_screen_rotation, goodix_ts_store_screen_rotation);
 
 static struct platform_driver goodix_ts_driver = {
 	.driver = {
@@ -2254,19 +2336,36 @@ static int __init goodix_ts_core_init(void)
 {
 	int ret;
 
-	ts_info("Core layer init:%s", GOODIX_DRIVER_VERSION);
-	
+	ts_info("core layer init:%s", GOODIX_DRIVER_VERSION);
+
 	ret = goodix_bus_init();
-	if (ret) {
+	if (ret != 0) {
 		ts_err("failed add bus driver");
 		return ret;
 	}
-	return platform_driver_register(&goodix_ts_driver);
+
+	ret = platform_driver_register(&goodix_ts_driver);
+	if (ret != 0) {
+		ts_err("driver register failed");
+		return ret;
+	}
+
+	if (goodix_modules.core_data) {
+		ret = driver_create_file(&goodix_ts_driver.driver, &driver_attr_screen_rotation);
+		if (ret != 0) {
+			ts_err("screen_rotation sysfs creation failed");
+		}
+	}
+
+	return ret;
 }
 
 static void __exit goodix_ts_core_exit(void)
 {
 	ts_info("Core layer exit");
+	if (goodix_modules.core_data) {
+		driver_remove_file(&goodix_ts_driver.driver, &driver_attr_screen_rotation);
+	}
 	platform_driver_unregister(&goodix_ts_driver);
 	goodix_bus_exit();
 	return;

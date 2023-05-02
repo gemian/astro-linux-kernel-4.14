@@ -427,7 +427,7 @@ struct goodix_ts_core {
 	struct goodix_ts_hw_ops *hw_ops;
 	struct input_dev *input_dev;
 	struct input_dev *pen_dev;
- 	/* TODO counld we remove this from core data? */
+ 	/* TODO could we remove this from core data? */
 	struct goodix_ts_event ts_event;
 
 	/* every pointer of this array represent a kind of config */
@@ -443,6 +443,7 @@ struct goodix_ts_core {
 	atomic_t suspended;
 	/* when this flag is true, driver should not clean the sync flag */
 	bool tools_ctrl_sync;
+	int screen_rotation;
 
 	struct notifier_block ts_notifier;
 	struct goodix_ts_esd ts_esd;

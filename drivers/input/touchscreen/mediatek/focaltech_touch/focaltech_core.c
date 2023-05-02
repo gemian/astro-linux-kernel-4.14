@@ -507,6 +507,69 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
     return -EINVAL;
 }
 
+enum {
+    RR_Rotate_0=1,
+    RR_Rotate_90=2,
+    RR_Rotate_180=4,
+    RR_Rotate_270=8
+};
+
+static void fts_set_screen_rotation(struct input_dev *input_dev, int val) {
+    struct fts_ts_data *ts = fts_data;
+    if (tpd_dts_data.tpd_screen_rotation != val) {
+        int x_min = ts->pdata->x_min;
+        int y_min = ts->pdata->y_min;
+        int x_max = ts->pdata->x_max;
+        int y_max = ts->pdata->y_max;
+        switch (val) {
+            case RR_Rotate_0:
+            case RR_Rotate_180:
+                x_max = ts->pdata->x_max;
+                y_max = ts->pdata->y_max;
+                break;
+            case RR_Rotate_90:
+            case RR_Rotate_270:
+                x_max = ts->pdata->y_max;
+                y_max = ts->pdata->x_max;
+                break;
+            default:
+                val = RR_Rotate_0;
+                break;
+        }
+        FTS_INFO("fts rotation:%d, x_min: %d, y_min: %d, x_max: %d, y_max: %d", val, x_min, y_min, x_max, y_max);
+        tpd_dts_data.tpd_screen_rotation = val;
+        input_set_abs_params(input_dev, ABS_MT_POSITION_X, x_min, x_max, 0, 0);
+        input_set_abs_params(input_dev, ABS_MT_POSITION_Y, y_min, y_max, 0, 0);
+    }
+}
+
+static void fts_input_report_rotated(struct input_dev *dev, int rotation, int xpos, int ypos) {
+    struct fts_ts_data *ts = fts_data;
+    int x = ypos;
+    int y = ts->pdata->x_max - xpos;
+    switch (rotation) {
+        case RR_Rotate_0: // 1
+            x = ts->pdata->x_max - xpos;
+            y = ypos;
+            break;
+        case RR_Rotate_90: // 2
+            x = ypos;
+            y = xpos;
+            break;
+        case RR_Rotate_180: // 4
+            x = xpos;
+            y = ts->pdata->y_max - ypos;
+            break;
+        case RR_Rotate_270: // 8
+            x = ts->pdata->y_max - ypos;
+            y = ts->pdata->x_max - xpos;
+            break;
+    }
+    FTS_INFO("fts report:%d, x: %d, y: %d", rotation, x, y);
+    input_report_abs(dev, ABS_MT_POSITION_X, x);
+    input_report_abs(dev, ABS_MT_POSITION_Y, y);
+}
+
 #if FTS_MT_PROTOCOL_B_EN
 static int fts_input_report_b(struct fts_ts_data *data)
 {
@@ -538,8 +601,8 @@ static int fts_input_report_b(struct fts_ts_data *data)
                 events[i].area = 0x09;
             }
             input_report_abs(data->input_dev, ABS_MT_TOUCH_MAJOR, events[i].area);
-            input_report_abs(data->input_dev, ABS_MT_POSITION_X, 1080 - events[i].y);
-            input_report_abs(data->input_dev, ABS_MT_POSITION_Y, events[i].x);
+            // GEMIAN - Note that the hardware seems to be rotated to landscape even though phone screens are mostly naturally portrait
+            fts_input_report_rotated(data->input_dev, tpd_dts_data.tpd_screen_rotation, events[i].y, events[i].x);
 
             touchs |= BIT(events[i].id);
             data->touchs |= BIT(events[i].id);
@@ -1026,8 +1089,7 @@ static int fts_input_init(struct fts_ts_data *ts_data)
 #else
     input_set_abs_params(input_dev, ABS_MT_TRACKING_ID, 0, 0x0F, 0, 0);
 #endif
-    input_set_abs_params(input_dev, ABS_MT_POSITION_X, pdata->x_min, pdata->x_max, 0, 0);
-    input_set_abs_params(input_dev, ABS_MT_POSITION_Y, pdata->y_min, pdata->y_max, 0, 0);
+    fts_set_screen_rotation(input_dev, RR_Rotate_90); //Gemian - Astro default orientation
     input_set_abs_params(input_dev, ABS_MT_TOUCH_MAJOR, 0, 0xFF, 0, 0);
 #if FTS_REPORT_PRESSURE_EN
     input_set_abs_params(input_dev, ABS_MT_PRESSURE, 0, 0xFF, 0, 0);
@@ -1246,7 +1308,7 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
     int pdata_size = sizeof(struct fts_ts_platform_data);
 
     FTS_FUNC_ENTER();
-    FTS_INFO("%s", FTS_DRIVER_VERSION);
+    FTS_INFO("MTFT: %s", FTS_DRIVER_VERSION);
     ts_data->pdata = kzalloc(pdata_size, GFP_KERNEL);
     if (!ts_data->pdata) {
         FTS_ERROR("allocate memory for platform_data fail");
@@ -1459,7 +1521,7 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
     int ret = 0;
     struct fts_ts_data *ts_data = NULL;
 
-    FTS_INFO("Touch Screen(I2C BUS) driver prboe...");
+    FTS_INFO("[MTFT] Touch Screen(I2C BUS) driver probe...");
     if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
         FTS_ERROR("I2C not supported");
         return -ENODEV;
@@ -1482,7 +1544,7 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
     fts_data = ts_data;
     ts_data->client = client;
     ts_data->dev = &client->dev;
-    ts_data->log_level = 1;
+    ts_data->log_level = 2;
     ts_data->fw_is_running = 0;
     ts_data->bus_type = BUS_TYPE_I2C;
     i2c_set_clientdata(client, ts_data);
@@ -1670,6 +1732,27 @@ static void tpd_resume(struct device *dev)
     FTS_FUNC_EXIT();
 }
 
+static ssize_t focaltech_read_screen_rotation(struct device *dev, struct device_attribute *attr, char *buf)
+{
+    return scnprintf(buf, PAGE_SIZE, "%d\n", tpd_dts_data.tpd_screen_rotation);
+}
+
+static ssize_t focaltech_store_screen_rotation(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+    struct input_dev *input_dev = fts_data->input_dev;
+    int val;
+    if (!kstrtoint(buf, 0, &val)) {
+        fts_set_screen_rotation(input_dev, val);
+    }
+    return count;
+}
+
+static DEVICE_ATTR(screen_rotation, S_IWUSR | S_IRUGO, focaltech_read_screen_rotation, focaltech_store_screen_rotation);
+
+static struct device_attribute *focaltech_attrs[] = {
+        &dev_attr_screen_rotation
+};
+
 /*****************************************************************************
 *  TPD Device Driver
 *****************************************************************************/
@@ -1678,6 +1761,10 @@ static struct tpd_driver_t tpd_device_driver = {
     .tpd_local_init = tpd_local_init,
     .suspend = tpd_suspend,
     .resume = tpd_resume,
+    .attrs = {
+        .attr = focaltech_attrs,
+        .num  = ARRAY_SIZE(focaltech_attrs),
+    },
 };
 
 /*****************************************************************************
