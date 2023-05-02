@@ -252,9 +252,9 @@ static s32 i2c_smbus_write_byte_nostop(struct i2c_client *client, unsigned char 
 	client->addr = old_flag;
 
 	return IIC_OK;*/
-	
+
 	i2c_smbus_write_byte_data(siiEDID, RegOffset, value);
-	
+
 	return IIC_OK;
 }
 
@@ -1095,9 +1095,9 @@ byte Parse861ShortDescriptors(byte *Data)
 				TPI_EDID_PRINT(("DataIndexbk=0x%x,DataBlockLength=0x%x\n",DataIndexbk,DataBlockLength));
 
                 //DataIndex += DataBlockLength - HDMI_SIGNATURE_LEN - CEC_PHYS_ADDR_LEN; // Point to start of next block
-               
+
 				DataIndex = DataIndexbk + DataBlockLength+1;
-				
+
                 TPI_EDID_PRINT(("DataIndex=0x%x!!!!!!!!!\n",DataIndex));
 			TPI_EDID_PRINT(("EDID -> Short Descriptor Vendor Block\n"));
 			TPI_EDID_PRINT(("\n"));
@@ -1176,7 +1176,7 @@ byte Parse861Extensions(byte NumOfExtensions)
 	byte Offset = 0;
 
 	g_edid.HDMI_Sink = FALSE;
-    g_edid.HDMI_compatible_VSDB = FALSE;	         
+	g_edid.HDMI_compatible_VSDB = FALSE;
     do
     {
 		Block++;
@@ -2591,7 +2591,7 @@ byte InitVideo(byte TclkSel)
 		temp = 0x00;
 		ReadModifyWriteTPI(0x40, BIT_2, 0x00);
 		break;
-		/* General Control Packet ¨C Deep color settings require the General Control Packet to be sent once per video field */
+		/* General Control Packet C Deep color settings require the General Control Packet to be sent once per video field */
 		/* with the correct PP and CD information. This must be enabled by software via TPI Deep Color Packet Enable */
 		/* Register 0x40[2] = 1, enable transmission of the GCP packet. */
 	}
@@ -3522,7 +3522,7 @@ g_sys.hdmiCableConnected,InterruptStatus,g_sys.dsRxPoweredUp,hdmi_9024_hpd_bak);
 
 			DelayMS(100); // Delay for metastability protection and to help filter out connection bouncing
 			ClearInterrupt(RX_SENSE_EVENT);
-			#endif
+		#endif
 		#if 1
 		if (((InterruptStatus & RX_SENSE_STATE) >> 3) != g_sys.dsRxPoweredUp) {
 			if (g_sys.hdmiCableConnected == TRUE) {

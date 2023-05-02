@@ -11,7 +11,7 @@ config TOUCHSCREEN_HIMAX_I2C
 	  If unsure,say N.
 
 config TOUCHSCREEN_HIMAX_COMMON
-        bool "HIMAX chipset common touchscreen"
+        tristate "HIMAX chipset common touchscreen"
 	depends on TOUCHSCREEN_HIMAX_CHIPSET
 	help
 	  Say Y here to enable support for I2C based touchscreens.

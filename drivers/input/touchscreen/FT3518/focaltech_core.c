@@ -1235,7 +1235,7 @@ static int fts_ts_probe(struct i2c_client *client,
 	int ret = 0;
 	struct fts_ts_data *ts_data = NULL;
 
-	FTS_INFO("Touch Screen(I2C BUS) driver prboe...");
+	FTS_INFO("[FT3581] Touch Screen(I2C BUS) driver probe...");
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		FTS_ERROR("I2C not supported");
 		return -ENODEV;

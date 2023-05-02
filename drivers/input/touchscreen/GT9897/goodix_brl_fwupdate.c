@@ -1278,7 +1278,7 @@ int goodix_fw_update_init(struct goodix_ts_core *core_data)
 
 	ret = goodix_fw_sysfs_init(core_data, &goodix_fw_update_ctrl);
 	if (ret) {
-		ts_err("failed create fwupate sysfs node");
+		ts_err("failed create fwupdate sysfs node");
 		return ret;
 	}
 	if (core_data->bus->ic_type == IC_TYPE_BERLIN_A) {

@@ -576,7 +576,7 @@ static int tpd_remove(struct platform_device *pdev)
 /* called when loaded into kernel */
 static void tpd_init_work_callback(struct work_struct *work)
 {
-	TPD_DEBUG("MediaTek touch panel driver init\n");
+	TPD_DEBUG("[GT1151] MediaTek touch panel driver init\n");
 	if (platform_driver_register(&tpd_driver) != 0)
 		TPD_ERR("unable to register touch panel driver.\n");
 }
