@@ -43,6 +43,7 @@
 #include <linux/extcon.h>
 #ifdef CONFIG_MTK_AW9524_UNDER_AW9523_LED
 #include <mt-plat/mtk_pwm.h>
+#include <linux/leds.h>
 #endif
 
 /**
@@ -66,6 +67,13 @@
 
 #include <linux/notifier.h>
 #include <soc/mediatek/hall.h>
+
+#endif
+
+#ifdef CONFIG_MTK_AW9524_UNDER_AW9523_LED
+
+#define LED_MAX_BRIGHTNESS 5
+#define DEFAULT_LED_NAME "kbd_backlight"
 
 #endif
 
@@ -230,7 +238,9 @@ struct aw9523_key_data {
     struct notifier_block hall_notif;
     bool is_device_closed;
 #endif
-
+#ifdef CONFIG_MTK_AW9524_UNDER_AW9523_LED
+	struct led_classdev led_dev;
+#endif
 };
 
 struct aw9523_pinctrl {
@@ -866,6 +876,32 @@ static const struct file_operations aw9524_led_proc_fops = {
 	.write = aw9524_led_proc_fops_write
 };
 
+static void aw9524_brightness_set(struct led_classdev *led_cdev,
+								  enum led_brightness val)
+{
+	switch ((int)val) {
+		case 0:
+			gpio_main_pwm_keyboardlight(0x00000000, 0x00000000); //0
+			break;
+		case 1:
+			gpio_main_pwm_keyboardlight(0x00001fff, 0x00000000); //20
+			break;
+		case 2:
+			gpio_main_pwm_keyboardlight(0x07ffffff, 0x00000000); //40
+			break;
+		case 3:
+			gpio_main_pwm_keyboardlight(0xffffffff, 0x0000003F); //60
+			break;
+		case 4:
+			gpio_main_pwm_keyboardlight(0xffffffff, 0x000fffff); //80
+			break;
+		case 5:
+			gpio_main_pwm_keyboardlight(0xffffffff, 0xffffffff); //100
+			break;
+	}
+}
+
+
 #endif
 
 static int aw9523_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id) {
@@ -907,6 +943,16 @@ static int aw9523_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 #ifdef CONFIG_MTK_AW9524_UNDER_AW9523_LED
     proc_create("aw9524_led_proc", 0777, NULL, &aw9524_led_proc_fops);
 	AW9523_LOG("aw9524_led_proc\n");
+
+	aw9523_key->led_dev.max_brightness = LED_MAX_BRIGHTNESS;
+	aw9523_key->led_dev.brightness_set = aw9524_brightness_set;
+	aw9523_key->led_dev.name = DEFAULT_LED_NAME;
+
+	err = devm_led_classdev_register(&client->dev, &aw9523_key->led_dev);
+	if (err) {
+		AW9523_LOG("led register err: %d\n", ret);
+		goto exit_create_singlethread;
+	}
 #endif
 
     aw9523_key->delay = 10;    //50
