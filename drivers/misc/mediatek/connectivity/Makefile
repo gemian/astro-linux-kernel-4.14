@@ -68,7 +68,7 @@ endif
     endif
 
     # Do build-in for xxx.c checking
-    subdir-ccflags-y += -D MTK_WCN_REMOVE_KERNEL_MODULE
+    #subdir-ccflags-y += -D MTK_WCN_REMOVE_KERNEL_MODULE
     subdir-ccflags-y += -D MTK_WCN_BUILT_IN_DRIVER
 
     ifneq ($(filter "CONSYS_6771", $(CONFIG_MTK_COMBO_CHIP)),)
