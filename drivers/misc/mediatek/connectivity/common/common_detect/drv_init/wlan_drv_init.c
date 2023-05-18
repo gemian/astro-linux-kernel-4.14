@@ -22,7 +22,7 @@
 
 int __attribute__((weak)) mtk_wcn_wlan_gen4_init()
 {
-	WMT_DETECT_PR_INFO("no impl. mtk_wcn_wlan_gen4_init\n");
+	WMT_DETECT_PR_INFO("no impl. mtk_wcn_wlan_gen4_init - common_detect\n");
 	return 0;
 }
 

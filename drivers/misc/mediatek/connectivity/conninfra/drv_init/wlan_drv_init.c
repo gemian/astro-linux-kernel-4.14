@@ -9,7 +9,7 @@
 
 int __attribute__((weak)) mtk_wcn_wlan_gen4_init()
 {
-	pr_info("no impl. mtk_wcn_wlan_gen4_init\n");
+	pr_info("no impl. mtk_wcn_wlan_gen4_init - conninfra\n");
 	return 0;
 }
 
