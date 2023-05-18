@@ -336,7 +336,7 @@ void fusb300_eint_work(struct work_struct *data)
 			if (gpio_get_value(hdmi_det_gpio)){
 				printk("===%s hdmi plug in===\n",__func__);
 				if(CCXstate == 0x10){
-					printk("===zhaolong====CC1=======\n",__func__);
+					printk("===zhaolong====CC1=======\n");
 					aeon_gpio_set("fusb301a_sw_en_low");//GPIO70 low
 					aeon_gpio_set("fusb301a_sw_sel_low");//GPIO71 low
 					//

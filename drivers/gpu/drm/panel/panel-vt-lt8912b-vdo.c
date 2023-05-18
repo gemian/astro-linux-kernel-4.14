@@ -640,7 +640,7 @@ static int lcm_probe(struct mipi_dsi_device *dsi)
 		printk("===%s hdmi plug in===0x11 CCXstate=0x%x\n", __func__, CCXstate);
 		CCXstate &= 0x30;
 		if(CCXstate == 0x10){
-			printk("===zhaolong====CC1=======\n",__func__);
+			printk("===zhaolong====CC1=======\n");
 			aeon_gpio_set("usbl_chg_en_high");//GPIO34
 			aeon_gpio_set("sil9022_hdmi_pwren1");//GPIO126
 			aeon_gpio_set("fusb301a_sw_en_low");//GPIO70 low
@@ -654,7 +654,7 @@ static int lcm_probe(struct mipi_dsi_device *dsi)
 			aeon_gpio_set("fusb301a_sw_sel_high");//GPIO71 high
 			//hdmi_plug_in_flag = 1;
 		}else {
-			printk("===zhaolong====CC1=====detect err for test==\n",__func__);
+			printk("===zhaolong====CC1=====detect err for test==\n");
 		}
 	}
 	

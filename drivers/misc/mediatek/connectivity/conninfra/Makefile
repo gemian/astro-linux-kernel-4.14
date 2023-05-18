@@ -95,7 +95,7 @@ ccflags-y += -I$(src)/debug_utility/connsyslog/platform/include
 ccflags-y += -I$(src)/debug_utility/coredump
 ccflags-y += -I$(src)/debug_utility/coredump/platform/include
 
-# By Plaftfrom
+# By Platform
 ccflags-y += -I$(src)/platform/$(CONNSYS_PLATFORM)/include
 
 ifneq ($(TARGET_BUILD_VARIANT), user)
@@ -128,7 +128,7 @@ $(MODULE_NAME)-objs += platform/consys_reg_mng.o
 
 $(MODULE_NAME)-objs += debug_utility/conninfra_dbg.o
 
-# By Plaftfrom
+# By Platform
 $(MODULE_NAME)-objs += platform/$(CONNSYS_PLATFORM)/$(CONNSYS_PLATFORM).o
 $(MODULE_NAME)-objs += platform/$(CONNSYS_PLATFORM)/$(CONNSYS_PLATFORM)_pmic.o
 $(MODULE_NAME)-objs += platform/$(CONNSYS_PLATFORM)/$(CONNSYS_PLATFORM)_emi.o
