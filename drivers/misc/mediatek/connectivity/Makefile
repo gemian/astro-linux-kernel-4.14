@@ -76,6 +76,21 @@ endif
         obj-$(CONFIG_MTK_COMBO_BT) += bt/mt66xx/legacy/
     endif
 
+    ifneq ($(filter "CONSYS_6873", $(CONFIG_MTK_COMBO_CHIP)),)
+        export WIFI_IP_SET=3
+        export WIFI_ENABLE_GCOV=
+        export MTK_ANDROID_EMI=y
+        export MTK_ANDROID_WMT=y
+        export WLAN_CHIP_ID=6873
+        export MTK_COMBO_CHIP=CONNAC2X2
+        export CONFIG_MTK_COMBO_WIFI_HIF=axi
+        export MTK_ANDROID_WMT=y
+        export MTK_WLAN_SERVICE=yes
+        export MODULE_NAME=wlan_drv_gen4m
+        obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/core/gen4m/
+    endif
+
+    export ADAPTOR_OPTS=CONNAC2X2
     obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/adaptor/
 
     ifneq (,$(filter $(CONFIG_MTK_COMBO_CHIP), "CONSYS_6885" "CONSYS_6893"))
