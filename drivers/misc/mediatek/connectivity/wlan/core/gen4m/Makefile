@@ -304,7 +304,7 @@ else ifeq ($(CONFIG_MTK_COMBO_WIFI_HIF), ut)
     # Increase frame size to 2048 because of 'cfg80211_connect_result' exceed stack size
     ccflags-y += -D_HIF_UT=1 -Wno-unused-function -Wno-unused-variable -Wframe-larger-than=2048
 else ifeq ($(CONFIG_MTK_COMBO_WIFI_HIF), none)
-	ccflags-y += -D_HIF_NONE=1
+    ccflags-y += -D_HIF_NONE=1
 else
     $(error Unsuppoted HIF=$(CONFIG_MTK_COMBO_WIFI_HIF)!!)
 endif

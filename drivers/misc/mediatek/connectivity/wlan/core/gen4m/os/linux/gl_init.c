@@ -5341,8 +5341,6 @@ static int initWlan(void)
 		(unsigned int *)&gConEmiSizeFinal);
 #endif
 
-	DBGLOG(INIT, INFO, "initWlan\n");
-
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
 
 	if (kalStrLen(gprifnamesta) > CUSTOM_IFNAMESIZ ||
@@ -5356,6 +5354,8 @@ static int initWlan(void)
 #endif /*  CFG_DRIVER_INF_NAME_CHANGE */
 
 	wlanDebugInit();
+
+	DBGLOG(INIT, INFO, "initWlan\n");
 
 	/* memory pre-allocation */
 #if CFG_PRE_ALLOCATION_IO_BUFFER

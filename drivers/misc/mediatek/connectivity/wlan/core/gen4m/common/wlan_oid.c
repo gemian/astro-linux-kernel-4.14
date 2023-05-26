@@ -11545,25 +11545,26 @@ wlanoidSetNvramWrite(IN struct ADAPTER *prAdapter,
 	rNvRwInfo = (struct PARAM_CUSTOM_EEPROM_RW_STRUCT *)
 			pvSetBuffer;
 
-	if (rNvRwInfo->ucMethod == PARAM_EEPROM_WRITE_NVRAM)
+	if (rNvRwInfo->ucMethod == PARAM_EEPROM_WRITE_NVRAM) {
 		fgStatus = kalCfgDataWrite8(prAdapter->prGlueInfo,
 			rNvRwInfo->info.rNvram.u2NvIndex,
 			rNvRwInfo->info.rNvram.u2NvData & 0x00FF);
-
-		DBGLOG(REQ, INFO, "status(%d),index=%#X, data=%#02X\n",
+	}
+	DBGLOG(REQ, INFO, "status(%d),index=%#X, data=%#02X\n",
 			fgStatus,
 			rNvRwInfo->info.rNvram.u2NvIndex,
 			rNvRwInfo->info.rNvram.u2NvData);
 
-		/*update nvram to firmware*/
-		if (fgStatus == TRUE)
-			wlanLoadManufactureData(prAdapter,
+	/*update nvram to firmware*/
+	if (fgStatus == TRUE) {
+		wlanLoadManufactureData(prAdapter,
 				kalGetConfiguration(prAdapter->prGlueInfo));
-	else
+	} else {
 		fgStatus = kalCfgDataWrite16(prAdapter->prGlueInfo,
 				     rNvRwInfo->info.rEeprom.ucEepromIndex <<
 				     1, /* change to byte offset */
 				     rNvRwInfo->info.rEeprom.u2EepromData);
+	}
 
 	if (fgStatus == FALSE) {
 		DBGLOG(REQ, ERROR, "NVRAM Write Failed.\r\n");

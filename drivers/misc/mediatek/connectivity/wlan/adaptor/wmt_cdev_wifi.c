@@ -287,7 +287,7 @@ int32_t wifi_reset_end(enum ENUM_RESET_STATUS status)
 	int32_t ret = -1;
 
 	if (status == RESET_FAIL) {
-		/* whole chip reset fail, donot recover WIFI */
+		/* whole chip reset fail, will not recover WIFI */
 		ret = 0;
 		up(&wr_mtx);
 	} else if (status == RESET_SUCCESS) {
@@ -702,6 +702,8 @@ static int WIFI_init(void)
 	int32_t cdev_err = 0;
 
 	low_latency_mode = 0;
+
+	WIFI_INFO_FUNC("wmt_cdev_wifi.c - WIFI_init\n");
 
 	sema_init(&wr_mtx, 1);
 
