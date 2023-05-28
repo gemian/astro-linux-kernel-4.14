@@ -39,7 +39,6 @@ endif
     $(MODULE_NAME)-objs += common/connectivity_build_in_adapter.o
     $(MODULE_NAME)-objs += common/wmt_build_in_adapter.o
 
-    obj-$(CONFIG_MTK_COMBO) += common/
 
     $(info $$CONFIG_MTK_COMBO_CHIP is [${CONFIG_MTK_COMBO_CHIP}])
     MTK_PLATFORM_ID := $(patsubst CONSYS_%,%,$(subst ",,$(CONFIG_MTK_COMBO_CHIP)))
@@ -68,10 +67,12 @@ endif
     endif
 
     # Do build-in for xxx.c checking
-    #subdir-ccflags-y += -D MTK_WCN_REMOVE_KERNEL_MODULE
+    subdir-ccflags-y += -D MTK_WCN_REMOVE_KERNEL_MODULE
     subdir-ccflags-y += -D MTK_WCN_BUILT_IN_DRIVER
 
     ifneq ($(filter "CONSYS_6771", $(CONFIG_MTK_COMBO_CHIP)),)
+        obj-$(CONFIG_MTK_COMBO) += common/
+        obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/adaptor/
         obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/core/gen3/
         obj-$(CONFIG_MTK_COMBO_BT) += bt/mt66xx/legacy/
     endif
@@ -87,11 +88,11 @@ endif
         export MTK_ANDROID_WMT=y
         export MTK_WLAN_SERVICE=yes
         export MODULE_NAME=wlan_drv_gen4m
+        export ADAPTOR_OPTS=CONNAC2X2
+        obj-$(CONFIG_MTK_COMBO) += common/
+        obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/adaptor/
         obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/core/gen4m/
     endif
-
-    export ADAPTOR_OPTS=CONNAC2X2
-    obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/adaptor/
 
     ifneq (,$(filter $(CONFIG_MTK_COMBO_CHIP), "CONSYS_6885" "CONSYS_6893"))
         export CFG_BUILD_CONNAC2=true

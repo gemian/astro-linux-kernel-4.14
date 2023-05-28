@@ -5577,7 +5577,7 @@ int32_t mtk_cfg80211_process_str_cmd(IN struct wiphy *wiphy,
 
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 
-#if (CFG_BUILT_IN_DRIVER == 1)
+#ifdef CONFIG_WLAN_DRV_BUILD_IN
 /* in kernel-x.x/net/wireless/reg.c */
 #else
 bool is_world_regdom(const char *alpha2)

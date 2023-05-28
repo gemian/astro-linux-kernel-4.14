@@ -11549,15 +11549,15 @@ wlanoidSetNvramWrite(IN struct ADAPTER *prAdapter,
 		fgStatus = kalCfgDataWrite8(prAdapter->prGlueInfo,
 			rNvRwInfo->info.rNvram.u2NvIndex,
 			rNvRwInfo->info.rNvram.u2NvData & 0x00FF);
-	}
-	DBGLOG(REQ, INFO, "status(%d),index=%#X, data=%#02X\n",
+
+		DBGLOG(REQ, INFO, "status(%d),index=%#X, data=%#02X\n",
 			fgStatus,
 			rNvRwInfo->info.rNvram.u2NvIndex,
 			rNvRwInfo->info.rNvram.u2NvData);
 
-	/*update nvram to firmware*/
-	if (fgStatus == TRUE) {
-		wlanLoadManufactureData(prAdapter,
+		/*update nvram to firmware*/
+		if (fgStatus == TRUE)
+			wlanLoadManufactureData(prAdapter,
 				kalGetConfiguration(prAdapter->prGlueInfo));
 	} else {
 		fgStatus = kalCfgDataWrite16(prAdapter->prGlueInfo,
