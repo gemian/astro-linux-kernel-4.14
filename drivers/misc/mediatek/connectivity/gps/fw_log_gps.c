@@ -162,7 +162,7 @@ void log_event_cb(void)
 	wake_up_interruptible(&GPS_log_wq);
 }
 
-static int __init gps_fw_log_init(void)
+static int gps_fw_log_init(void)
 {
 	int ret = 0;
 	int err = 0;
@@ -217,7 +217,7 @@ err_out:
 }
 
 /*****************************************************************************/
-static void __exit gps_fw_log_exit(void)
+static void gps_fw_log_exit(void)
 {
 	if (!logdevobj) {
 		pr_err("null pointer: %p\n", logdevobj);
